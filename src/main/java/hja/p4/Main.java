@@ -12,6 +12,7 @@ public class Main {
 
     public static void main(String[] args) {
         JuegoMentiroso juego = new JuegoMentiroso();
-        juego.iniciarJuego();
+        Player p = juego.jugar();
+        System.out.println("Felicidades ha ganado al mentiroso, recuerde que en la vida no hay que mentir." +p.toString());
     }
 }

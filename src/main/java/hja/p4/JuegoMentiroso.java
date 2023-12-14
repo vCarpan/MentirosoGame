@@ -3,36 +3,57 @@ package hja.p4;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Scanner;
 
 public class JuegoMentiroso {
-
+    static int N_JUGADORES = 3;
     private List<Carta> baraja;
-    private List<Carta> jugador1;
-    private List<Carta> jugador2;
-    private List<Carta> jugador3;
     private List<Carta> mesa;
-    private Scanner scanner;
+    private List<Player> players;
 
     public JuegoMentiroso() {
         this.baraja = crearBaraja();
-        this.jugador1 = new ArrayList<>();
-        this.jugador2 = new ArrayList<>();
-        this.jugador3 = new ArrayList<>();
         this.mesa = new ArrayList<>();
-        this.scanner = new Scanner(System.in);
+        this.players = new ArrayList<>();
+        for(int i=0; i<N_JUGADORES; i++){
+            this.players.add(new Player("J"+i));
+        }
     }
 
-    public void iniciarJuego() {
+    public Player jugar() {
         repartirCartasAleatoriamente();
-
-        while (!jugador1.isEmpty() && !jugador2.isEmpty() && !jugador3.isEmpty()) {
-            declararYJugar(jugador1);
-            declararYJugar(jugador2);
-            declararYJugar(jugador3);
+        boolean fin = false;
+        boolean levantar;
+        boolean mentira;
+        int ganador = 0;
+        while(!fin){
+            for(int i=0; i<N_JUGADORES; i++){
+                Pair<String, List<Carta>> pair = players.get(i).declararYJugar();
+                mesa.addAll(pair.getElement1());   
+                int next = (i+1)%N_JUGADORES;
+                levantar = players.get(next).contestar();
+                if(levantar){
+                    mentira = false;
+                    for (Carta c : pair.getElement1()) {
+                        if(c.getValor().equals(pair.getElement0())){
+                            mentira = true;
+                            break;
+                        }
+                    }
+                    if(mentira){
+                        players.get(i).addCards(mesa);
+                    }else{
+                        players.get(next).addCards(mesa);
+                    }
+                    mesa.clear();
+                }     
+                if(players.get(i).isWin()) {
+                    fin = true;
+                    ganador = i;
+                    break;
+                }
+            }
         }
-
-        scanner.close();
+        return players.get(ganador);
     }
 
     private List<Carta> crearBaraja() {
@@ -51,71 +72,11 @@ public class JuegoMentiroso {
 
     private void repartirCartasAleatoriamente() {
         Collections.shuffle(baraja);
-        for (int i = 0; i < baraja.size(); i++) {
-            if (i % 3 == 0) {
-                jugador1.add(baraja.get(i));
-            } else if (i % 3 == 1) {
-                jugador2.add(baraja.get(i));
-            } else {
-                jugador3.add(baraja.get(i));
+        int i=0;
+        while(i<baraja.size()){
+            for(int j=0; j<N_JUGADORES && i<baraja.size(); j++,i++){
+                players.get(j).addCard(baraja.get(i));
             }
-        }
-    }
-
-    private void declararYJugar(List<Carta> jugador) {
-        System.out.println("Mano actual del jugador: " + jugador);
-        System.out.print("Declarar Cartas: ");
-        String declaracion = scanner.nextLine();
-        procesarDeclaracion(declaracion, jugador);
-
-        // Jugar cartas después de la declaración
-        System.out.print("Ingresa las cartas para jugar: ");
-        String cartasJugadasInput = scanner.nextLine();
-        String[] cartasJugadas = cartasJugadasInput.split(",");
-
-        for (String cartaJugada : cartasJugadas) {
-            Carta cartaSeleccionada = null;
-            for (Carta carta : jugador) {
-                if (carta.toString().equalsIgnoreCase(cartaJugada)) {
-                    cartaSeleccionada = carta;
-                    break;
-                }
-            }
-
-            if (cartaSeleccionada != null) {
-                System.out.println("¡Carta válida!");
-
-                // Retira la carta jugada de la mano del jugador
-                jugador.remove(cartaSeleccionada);
-
-                // Agrega la carta jugada a la mesa
-                mesa.add(cartaSeleccionada);
-            } else {
-                System.out.println("¡Carta no válida! Intenta de nuevo.");
-                declararYJugar(jugador); // Intentar de nuevo en caso de carta no válida
-                return; // Salir del método para evitar procesar el turno siguiente
-            }
-        }
-    }
-
-    private void procesarDeclaracion(String declaracion, List<Carta> jugador) {
-        String[] partes = declaracion.split(" ");
-        int cantidadDeclarada = Integer.parseInt(partes[0]);
-
-        if (cantidadDeclarada > 0 && cantidadDeclarada <= jugador.size()) {
-            for (int i = 0; i < cantidadDeclarada; i++) {
-                String valorDeclarado = partes[1];
-                for (Carta carta : jugador) {
-                    if (carta.getValor().equalsIgnoreCase(valorDeclarado)) {
-                        mesa.add(carta);
-                        jugador.remove(carta);
-                        break;
-                    }
-                }
-            }
-        } else {
-            System.out.println("Declaración no válida. Intenta de nuevo.");
-            declararYJugar(jugador); // Intentar de nuevo en caso de declaración no válida
         }
     }
 }
