@@ -13,12 +13,25 @@ public class Carta {
         this.palo = palo;
     }
 
+    public Carta(String cartas) {
+        this.valor = cartas.charAt(0)+ "";
+        this.palo = cartas.charAt(1)+"";
+    }
+
     @Override
     public String toString() {
         return valor + palo;
     }
+    
+    public boolean isEqual(Carta a){
+        return this.valor.equals(a.getValor()) && this.palo.equals(a.getPalo());
+    }
 
     public String getValor() {
         return valor;
+    }
+    
+        public String getPalo() {
+        return palo;
     }
 }

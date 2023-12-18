@@ -40,7 +40,7 @@ public class Player {
         }
         System.out.print("Valor de la Carta: Ej(J)");
         String valor = scanner.nextLine();
-        if(procesarDeclaracion(cartas,valor)){
+        if(!procesarDeclaracion(cartas,valor)){
             System.out.println("Error: Declaracion incorrecta");
             return declararYJugar();
         }
@@ -56,7 +56,14 @@ public class Player {
                 return false;
             }
             Carta c = new Carta(arrayCarta.charAt(0) + "", arrayCarta.charAt(1) + "");
-            if(!this.cartas.contains(c)){
+            boolean encontrado = false;
+            for(Carta aux: this.cartas){
+                if(aux.isEqual(c)){
+                    encontrado = true;
+                    break;
+                }
+            }
+            if(!encontrado){
                 System.out.println("No tienes esas cartas pillin!");
                 return false;
             }
@@ -67,6 +74,7 @@ public class Player {
         }
         return true;
     }
+    
     private boolean checkValor(String valor){
         return cardValues.contains(valor);
         
@@ -76,7 +84,14 @@ public class Player {
     }
 
     boolean contestar() {
-        return true;
+        System.out.println("Quiere destapar la verdad? (responda con 0 o 1)");
+        String decision = scanner.nextLine();
+        if(decision.equals("0")){
+            return false;
+        }
+        else{
+            return true;
+        } 
     }
 
     void addCards(List<Carta> mesa) {
