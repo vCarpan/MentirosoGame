@@ -15,10 +15,10 @@ import java.util.Scanner;
  */
 public class Player {
     
-    private List<Carta> cartas;
+    protected List<Carta> cartas;
     private Scanner scanner;
-    private String id;
-    private static List<String> cardValues = new ArrayList<>();
+    protected String id;
+    protected static List<String> cardValues = new ArrayList<>();
     public Player(String id){
         this.id = id;
         this.cartas = new ArrayList<>();
@@ -28,28 +28,40 @@ public class Player {
     public void addCard(Carta c){
         this.cartas.add(c);
     }
-    public Pair<String, List<Carta>> declararYJugar() {
+    public String declarar(){
         System.out.println("Mano actual del jugador: " + cartas);
-        System.out.print("---DECLARACION "+id+"---");
+        System.out.print("Valor de la Carta: Ej(J)");
+        String valor = scanner.nextLine();
+        if(!checkValor(valor)){
+            System.out.println("Error: Declaracion incorrecta");
+            return declarar();
+        }
+        return valor;
+        
+    }
+    public List<Carta> jugar(String valor) {
+        System.out.println("Mano actual del jugador: " + cartas);
         System.out.print("Elige Cartas: Ej(Ac Ad)");
         String cartas = scanner.nextLine();
         String[] arrayCartas = cartas.split(" ");
-        List<Carta> listCartas = new ArrayList<Carta>();
+        List<Carta> listCartas = new ArrayList<Carta>();  
+        if(!procesarJugada(arrayCartas)){
+            System.out.println("Error: Cartas incorrectas");
+            return jugar(valor);
+        }
         for(String carta: arrayCartas){
-            listCartas.add(new Carta(carta.charAt(0) + "", carta.charAt(1) + ""));
-        }
-        System.out.print("Valor de la Carta: Ej(J)");
-        String valor = scanner.nextLine();
-        if(!procesarDeclaracion(cartas,valor)){
-            System.out.println("Error: Declaracion incorrecta");
-            return declararYJugar();
-        }
-        return new Pair<String, List<Carta>>(valor,listCartas);
-        
-        
+            Carta c = new Carta(carta.charAt(0) + "", carta.charAt(1) + "");
+            listCartas.add(c);
+            removeCard(c);
+        }  
+        return listCartas;   
     }
-    private boolean procesarDeclaracion(String cartas,String valor) {
-        String[] arrayCartas = cartas.split(" ");
+    public void removeCard(Carta c){
+        for(int i=0; i<cartas.size();i++){
+            if(cartas.get(i).isEqual(c)) {cartas.remove(i); break;};
+        }
+    }
+    private boolean procesarJugada(String[] arrayCartas) {
         for (String arrayCarta : arrayCartas) {
             if (arrayCarta.length() != 2) {
                 System.out.println("Formato no valido");
@@ -68,13 +80,11 @@ public class Player {
                 return false;
             }
         }
-        if(!checkValor(valor)){
-            System.out.println("Valor incorrecto");
-            return false;
-        }
         return true;
     }
-    
+    public String getId(){
+        return id;
+    }
     private boolean checkValor(String valor){
         return cardValues.contains(valor);
         
@@ -83,15 +93,10 @@ public class Player {
         return cartas.isEmpty();
     }
 
-    boolean contestar() {
-        System.out.println("Quiere destapar la verdad? (responda con 0 o 1)");
+    boolean contestar(String valor,int nCartas) {
+        System.out.println("Quiere destapar la verdad? (responda con 0 -> No o 1-> Si)");
         String decision = scanner.nextLine();
-        if(decision.equals("0")){
-            return false;
-        }
-        else{
-            return true;
-        } 
+        return decision.equals("1");
     }
 
     void addCards(List<Carta> mesa) {

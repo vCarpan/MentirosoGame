@@ -13,6 +13,6 @@ public class Main {
     public static void main(String[] args) {
         JuegoMentiroso juego = new JuegoMentiroso();
         Player p = juego.jugar();
-        System.out.println("Felicidades ha ganado al mentiroso, recuerde que en la vida no hay que mentir." +p.toString());
+        System.out.println("Felicidades ha ganado al mentiroso, recuerde que en la vida no hay que mentir." +p.getId());
     }
 }

@@ -14,9 +14,10 @@ public class JuegoMentiroso {
         this.baraja = crearBaraja();
         this.mesa = new ArrayList<>();
         this.players = new ArrayList<>();
-        for(int i=0; i<N_JUGADORES; i++){
+        for(int i=0; i<N_JUGADORES -1; i++){
             this.players.add(new Player("J"+i));
         }
+        this.players.add(new Bot("B1","mono"));
     }
 
     public Player jugar() {
@@ -24,27 +25,46 @@ public class JuegoMentiroso {
         boolean fin = false;
         boolean levantar;
         boolean mentira;
+        String declarado = "";
+        boolean finTurno = true;
         int ganador = 0;
         while(!fin){
             for(int i=0; i<N_JUGADORES; i++){
-                Pair<String, List<Carta>> pair = players.get(i).declararYJugar();
-                mesa.addAll(pair.getElement1());   
+                if(finTurno){
+                    finTurno = false;
+                    System.out.println("---DECLARACION "+players.get(i).getId()+"---");
+                    declarado = players.get(i).declarar();
+                }else{
+                    System.out.println("---TURNO "+players.get(i).getId()+"---");
+                }
+                List<Carta> cartas= players.get(i).jugar(declarado);
+                System.out.println("---Voy con "+cartas.size()+" "+declarado);
+                mesa.addAll(cartas);   
                 int next = (i+1)%N_JUGADORES;
-                levantar = players.get(next).contestar();
+                levantar = players.get(next).contestar(declarado,cartas.size());
                 if(levantar){
                     mentira = false;
-                    for (Carta c : pair.getElement1()) {
-                        if(c.getValor().equals(pair.getElement0())){
+                    for (Carta c : cartas) {
+                        if(!c.getValor().equals(declarado)){
                             mentira = true;
                             break;
                         }
                     }
                     if(mentira){
+                        System.out.println("---El jugador "+players.get(i).getId()+" se lleva las cartas");
                         players.get(i).addCards(mesa);
                     }else{
+                        if(players.get(i).isWin()) {
+                            fin = true;
+                            ganador = i;
+                            return players.get(ganador);
+                        }
+                        i= (i+1)%N_JUGADORES;
+                        System.out.println("---El jugador "+players.get(next).getId()+" se lleva las cartas");
                         players.get(next).addCards(mesa);
                     }
                     mesa.clear();
+                    finTurno = true;
                 }     
                 if(players.get(i).isWin()) {
                     fin = true;
