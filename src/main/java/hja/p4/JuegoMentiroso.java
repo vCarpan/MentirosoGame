@@ -1,14 +1,23 @@
 package hja.p4;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class JuegoMentiroso {
     static int N_JUGADORES = 3;
     private List<Carta> baraja;
     private List<Carta> mesa;
     private List<Player> players;
+    private static final String STATS_FILE_PATH = "estadisticas.json";
+    static Map<String, Estadisticas> estadisticasMap = new HashMap<>();
 
     public JuegoMentiroso() {
         this.baraja = crearBaraja();
@@ -17,7 +26,20 @@ public class JuegoMentiroso {
         for(int i=0; i<N_JUGADORES -1; i++){
             this.players.add(new Player("J"+i));
         }
-        this.players.add(new Bot("B1","mono"));
+        Bot bot = new Bot("B1","mono");
+        bot.setIndexLeftPlayer(players.size()-1);
+        bot.setIndexRightPlayer(0);
+        this.players.add(bot);
+        
+        cargarEstadisticasDesdeArchivo();
+        for (Player player : players) {
+            String playerId = player.getId();
+            if (!estadisticasMap.containsKey(playerId)) {
+                Estadisticas stats = new Estadisticas();
+                estadisticasMap.put(playerId, stats);
+            }
+    }
+        
     }
 
     public Player jugar() {
@@ -44,6 +66,7 @@ public class JuegoMentiroso {
                 levantar = players.get(next).contestar(declarado,cartas.size());
                 if(levantar){
                     mentira = false;
+                    estadisticasMap.get(players.get(next).getId()).incrementarLevantar();
                     for (Carta c : cartas) {
                         if(!c.getValor().equals(declarado)){
                             mentira = true;
@@ -51,12 +74,15 @@ public class JuegoMentiroso {
                         }
                     }
                     if(mentira){
+                        estadisticasMap.get(players.get(i).getId()).incrementarMentiras();                   
                         System.out.println("---El jugador "+players.get(i).getId()+" se lleva las cartas");
                         players.get(i).addCards(mesa);
                     }else{
+                        estadisticasMap.get(players.get(i).getId()).incrementarVerdades();  
                         if(players.get(i).isWin()) {
                             fin = true;
                             ganador = i;
+                            guardarEstadisticasEnArchivo();
                             return players.get(ganador);
                         }
                         i= (i+1)%N_JUGADORES;
@@ -65,10 +91,13 @@ public class JuegoMentiroso {
                     }
                     mesa.clear();
                     finTurno = true;
-                }     
+                }else{
+                    estadisticasMap.get(players.get(next).getId()).incrementarNoLevantar();
+                }
                 if(players.get(i).isWin()) {
                     fin = true;
                     ganador = i;
+                    guardarEstadisticasEnArchivo();
                     break;
                 }
             }
@@ -99,4 +128,56 @@ public class JuegoMentiroso {
             }
         }
     }
+    private void cargarEstadisticasDesdeArchivo() {
+        try (FileReader fileReader = new FileReader(STATS_FILE_PATH)) {
+            StringBuilder content = new StringBuilder();
+            int character;
+
+            while ((character = fileReader.read()) != -1) {
+                content.append((char) character);
+            }
+
+            if (content.length() > 0) {
+                JSONArray jsonArray = new JSONArray(content.toString());
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonData = jsonArray.getJSONObject(i);
+                    String playerId = jsonData.getString("id");
+                    Estadisticas stats = new Estadisticas();
+                    stats.setNPartidas(jsonData.getInt("nPartidas"));
+                    stats.setMentiras(jsonData.getInt("mentiras"));
+                    stats.setVerdades(jsonData.getInt("verdades"));
+                    stats.setLevantar(jsonData.getInt("levantar"));
+                    stats.setNoLevantar(jsonData.getInt("noLevantar"));
+                    estadisticasMap.put(playerId, stats);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void guardarEstadisticasEnArchivo() {
+        try (FileWriter fileWriter = new FileWriter(STATS_FILE_PATH)) {
+            JSONArray jsonArray = new JSONArray();
+
+            for (Player player : players) {
+                String playerId = player.getId();
+                Estadisticas stats = estadisticasMap.get(playerId);
+                JSONObject jsonData = new JSONObject();
+                jsonData.put("id", playerId);
+                jsonData.put("nPartidas", stats.getNPartidas());
+                jsonData.put("mentiras", stats.getMentiras());
+                jsonData.put("verdades", stats.getVerdades());
+                jsonData.put("levantar", stats.getLevantar());
+                jsonData.put("noLevantar", stats.getNoLevantar());
+                jsonArray.put(jsonData);
+            }
+
+            fileWriter.write(jsonArray.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+        
 }

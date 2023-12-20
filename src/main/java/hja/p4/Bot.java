@@ -17,6 +17,8 @@ public class Bot extends Player{
     
     private String tipo;
     final int N = 1, M=4;
+    private int indexLeftPlayer;
+    private int indexRightPlayer;
     public Bot(String id, String tipo) {
         super(id);
         this.tipo = tipo;
@@ -81,15 +83,35 @@ public class Bot extends Player{
             if(c.getValor().equals(valor)) sum++;
         }
         if(nCartas > (4 - sum)) return true;
-        if(Math.random() > 0.5){
-            System.out.println("Soy " + id + " y decido que es mentira");
-            return true;
+        switch(this.tipo){
+            case "inteligente":
+                Estadisticas stats = JuegoMentiroso.estadisticasMap.get(indexLeftPlayer);
+                if(stats.getNPartidas()<1){
+                    
+                }else{
+                    int suma = stats.getMentiras()+ stats.getVerdades();
+                }
+                break;
+            case "mono":
+                if(Math.random() > 0.5){
+                    System.out.println("Soy " + id + " y decido que es mentira");
+                    return true;
+                }
+                else{
+                    System.out.println("Soy " + id + " y decido que es verdad");
+                    return false;
+                }
         }
-        else{
-            System.out.println("Soy " + id + " y decido que es verdad");
-            return false;
-        }
+        return false;
 
+    }
+
+    void setIndexLeftPlayer(int i) {
+        indexLeftPlayer = i;
+    }
+
+    void setIndexRightPlayer(int i) {
+        indexRightPlayer = i;
     }
     
 }
