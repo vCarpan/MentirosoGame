@@ -238,12 +238,12 @@ public class Bot extends Player{
                 } else {
                     int suma = stats.getLevantar() + stats.getNoLevantar();
                     int porcentajeLevantar = (suma > 0) ? (stats.getLevantar() * 100) / suma : 0;
-                    int random = (int) (N + Math.random() * (101)); // Rango de 0 a 100
+                    int random = (int) N + (int) (Math.random() * ((100 - 0) + 1));
                     System.out.println("random: " + random + " levantar:" + porcentajeLevantar);
                     if (random > porcentajeLevantar || contador == 0) {
                         // Caso: Mienta
-                        random2 = (porcentajeLevantar > 50) ? (int) N + (int) (Math.random() * ((1 - 2) + 1))
-                                                            : (int) N + (int) (Math.random() * ((1 - 3) + 1));;
+                        random2 = (porcentajeLevantar > 50) ? (int) N + (int) (Math.random() * ((2 - 1) + 1))
+                                                            : (int) N + (int) (Math.random() * ((3 - 1) + 1));;
 
                         for (Iterator<List<Carta>> iter = this.cartas.values().iterator(); iter.hasNext();) {
                             List<Carta> lista = iter.next();
@@ -287,7 +287,7 @@ public class Bot extends Player{
                         }
                     } else {
                         // Caso: Diga la verdad
-                        random2 = (int) N + (int) (Math.random() * ((1 - 3) + 1));
+                        random2 = (int) N + (int) (Math.random() * ((3 - 1) + 1));
                         if (porcentajeLevantar > 50) {
                             Carta carta = this.cartas.get(valor).get(0);
                             cartas.add(carta);
@@ -343,7 +343,7 @@ public class Bot extends Player{
         switch(this.tipo){
             case "inteligente":
                 if(nCartasJugador <5 && turno!=indexLeftPlayer){
-                    int random = (int) (N + Math.random() * (101)); // Rango de 0 a 100
+                    int random = (int) N + (int) (Math.random() * ((100 - 0) + 1));
                     if(random > 80){
                         return false;
                     }
@@ -356,7 +356,7 @@ public class Bot extends Player{
                         }else if(sum>0){
                             return false;
                         }else{
-                            int random = (int) N + (int) (Math.random() * ((0 - 100) + 1));
+                            int random = (int) N + (int) (Math.random() * ((100 - 0) + 1));
                             if(random > 80){
                                 return false;
                             }
@@ -365,7 +365,7 @@ public class Bot extends Player{
                     }else{
                         int suma = stats.getMentiras()+ stats.getVerdades();
                         int porcentajeMentiras = (stats.getMentiras()/suma)*100;
-                        int random = (int) (N + Math.random() * (101)); // Rango de 0 a 100
+                        int random = (int) N + (int) (Math.random() * ((100 - 0) + 1));
                         if(random >porcentajeMentiras){
                             //No levanto
                             return false;
