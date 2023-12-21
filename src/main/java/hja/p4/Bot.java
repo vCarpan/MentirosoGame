@@ -351,22 +351,19 @@ public class Bot extends Player{
                 }else{
                     Estadisticas stats = JuegoMentiroso.estadisticasMap.get(indexLeftPlayer);
                     if(stats.getNRondas()<30){
-                        if(nCartas >= 2 && sum==2){
-                            return true; //levanta
-                        }else if(sum>0){
-                            return false;
-                        }else{
-                            int random = (int) N + (int) (Math.random() * ((100 - 0) + 1));
-                            if(random > 80){
-                                return false;
-                            }
+                        if(Math.random() > 0.5){
+                            System.out.println("Soy " + id + " y decido que es mentira");
                             return true;
+                        }
+                        else{
+                            System.out.println("Soy " + id + " y decido que es verdad");
+                            return false;
                         }
                     }else{
                         int suma = stats.getMentiras()+ stats.getVerdades();
                         int porcentajeMentiras = (stats.getMentiras()/suma)*100;
                         int random = (int) N + (int) (Math.random() * ((100 - 0) + 1));
-                        if(random >porcentajeMentiras){
+                        if(random <porcentajeMentiras){
                             //No levanto
                             return false;
                         }else{

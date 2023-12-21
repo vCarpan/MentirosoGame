@@ -26,14 +26,17 @@ public class JuegoMentiroso {
         for(int i=0; i<N_JUGADORES -3; i++){
             this.players.add(new Player("J"+i));
         }
-        this.players.add(new Bot("M0","mono"));
+        Bot bot1 = new Bot("M0","inteligente");
+        this.players.add(bot1);
+        bot1.setIndexLeftPlayer("M1");
+        bot1.setIndexRightPlayer("I1");
         
         Bot bot = new Bot("I1","inteligente");
         bot.setIndexLeftPlayer(players.get(0).getId());
-        bot.setIndexRightPlayer("I2");
+        bot.setIndexRightPlayer("M1");
         
-        
-        Bot bot2 = new Bot("I2","inteligente");
+        Bot bot2 = new Bot("M1","inteligente");
+        //Bot bot2 = new Bot("I2","inteligente");
         bot2.setIndexLeftPlayer("I1");
         bot2.setIndexRightPlayer(players.get(0).getId());
         this.players.add(bot);
