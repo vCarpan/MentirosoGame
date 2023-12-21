@@ -4,6 +4,9 @@
  */
 package hja.p4;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
  * @author penap
@@ -11,8 +14,22 @@ package hja.p4;
 public class Main {
 
     public static void main(String[] args) {
-        JuegoMentiroso juego = new JuegoMentiroso();
-        Player p = juego.jugar();
-        System.out.println("Felicidades ha ganado al mentiroso, recuerde que en la vida no hay que mentir." +p.getId());
+        
+        Player p;
+        Map<String, Integer> victorias = new HashMap<>();
+        for(int i = 0; i < 10; i++){
+            JuegoMentiroso juego = new JuegoMentiroso();
+            System.out.println("##########################JUEGO Numero: " + i);
+            p = juego.jugar();
+            if(victorias.containsKey(p.getId())){
+                victorias.put(p.getId(), victorias.get(p.getId())+1);
+            }
+            else{
+                victorias.put(p.getId(), 1);
+            }
+        }
+            
+        
+        System.out.println("victorias: " + victorias.toString());
     }
 }
