@@ -96,12 +96,13 @@ public class JuegoMentiroso {
                 }else{
                     estadisticasMap.get(players.get(next).getId()).incrementarNoLevantar();
                 }
+                guardarEstadisticasEnArchivo();
                 if(players.get(i).isWin()) {
                     fin = true;
                     ganador = i;
-                    guardarEstadisticasEnArchivo();
                     break;
                 }
+                
             }
         }
         return players.get(ganador);

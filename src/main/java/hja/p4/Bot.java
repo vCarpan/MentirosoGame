@@ -58,166 +58,226 @@ public class Bot extends Player{
                 boolean mentir = Math.random() > 0.5;
                 if(!mentir&&contador==0) mentir = true;
                 if(mentir){
-                    contador =0;
-                    for (List<Carta> lista : this.cartas.values()) {
-                        for (int i = 0; i < lista.size(); i++) {
-                            if(!lista.get(i).getValor().equals(valor)) {cartas.add(lista.get(i)); lista.remove(i);contador++;}              
-                            if(contador >= valorEntero) break; 
+                    contador = 0;
+
+                    for (Iterator<List<Carta>> iterCartas = this.cartas.values().iterator(); iterCartas.hasNext();) {
+                        List<Carta> lista = iterCartas.next();
+
+                        for (Iterator<Carta> iter = lista.iterator(); iter.hasNext();) {
+                            Carta carta = iter.next();
+
+                            if (!carta.getValor().equals(valor)) {
+                                cartas.add(carta);
+                                iter.remove();
+                                contador++;
+                            }
+
+                            if (contador >= valorEntero) {
+                                break;
+                            }
                         }
-                        
-                        if(contador >= valorEntero) break; 
+
+                        if (lista.isEmpty()) {
+                            iterCartas.remove(); // Remover la lista si está vacía
+                        }
+
+                        if (contador >= valorEntero) {
+                            break;
+                        }
                     }
                     if(contador < valorEntero && this.cartas.size()>0){
-                        for (List<Carta> lista : this.cartas.values()) {
-                            for (int i = 0; i < lista.size(); i++) {
-                                cartas.add(lista.get(i));
-                                lista.remove(i);                             
-                                removeCard(lista.get(i));
+                        for (Iterator<List<Carta>> iterCartas = this.cartas.values().iterator(); iterCartas.hasNext();) {
+                            List<Carta> lista = iterCartas.next();
+
+                            for (Iterator<Carta> iter = lista.iterator(); iter.hasNext();) {
+                                Carta carta = iter.next();
+
+                                cartas.add(carta);
+                                iter.remove();
                                 contador++;
-                                if(contador >= valorEntero) break; 
+
+                                if (contador >= valorEntero) {
+                                    break;
+                                }
                             }
-                            if(contador >= valorEntero) break; 
-                        }
-                        
+
+                            // Verifica si la lista está vacía después de la eliminación de cartas
+                            if (lista.isEmpty()) {
+                                iterCartas.remove();
+                            }
+
+                            if (contador >= valorEntero) {
+                                break;
+                            }
+                        }                        
                     }
                     System.out.println("Soy " + id + " y meto " + cartas);
                     return cartas;
                 }
                 else{
-                    for(Carta c: this.cartas.get(valor)){
-                        if(c.getValor().equals(valor)) {cartas.add(c);removeCard(c); contador++;}
-                        if(contador >= valorEntero) break;  
+                    contador = 0;
+
+                    List<Carta> lista = this.cartas.get(valor);
+
+                    if (lista != null) {
+                        for (Iterator<Carta> iter = lista.iterator(); iter.hasNext();) {
+                            Carta carta = iter.next();
+
+                            if (carta.getValor().equals(valor)) {
+                                cartas.add(carta);
+                                contador++;
+                                iter.remove(); // Elimina la carta de la lista actual
+
+                                if (contador >= valorEntero) {
+                                    break;
+                                }
+                            }
+                        }
+
+                        // Verifica si la lista está vacía después de la eliminación de cartas
+                        if (lista.isEmpty()) {
+                            this.cartas.remove(valor);
+                        }
                     }
                     System.out.println("Soy " + id + " y meto " + cartas);
                     return cartas;
                 }
             case "inteligente":
                 Estadisticas stats = JuegoMentiroso.estadisticasMap.get(indexRightPlayer);
-                if(stats.getNRondas()<10){
-                    if(contador > 0){
-                        cartas.add(this.cartas.get(valor).get(0));
-                        removeCard(this.cartas.get(valor).get(0));
-                        System.out.println("Soy " + id + " y meto " + cartas);
-                        return cartas;
-                    }else{
-                        int random2 = (int) (Math.floor(Math.random()*(1-2+1)+2));
-                        for (List<Carta> lista : this.cartas.values()) {
-                            if(lista.size()==1 && lista.get(0).getValor()!=valor){
-                                for(Carta c: lista){
-                                    cartas.add(c);
-                                    removeCard(c);
-                                    if(cartas.size()>=random2) break;
+                int random2;
+
+                if (stats.getNRondas() < 10) {
+                    if (contador > 0) {
+                        // Caso: contador > 0
+                        Carta carta = this.cartas.get(valor).get(0);
+                        cartas.add(carta);
+                        removeCard(carta);
+                    } else {
+                        // Caso: contador == 0
+                        random2 = (int) (Math.floor(Math.random() * (1 - 2 + 1) + 2));
+                        for (Iterator<List<Carta>> iter = this.cartas.values().iterator(); iter.hasNext();) {
+                            List<Carta> lista = iter.next();
+                            if(lista.size()==1){
+                                processListWithIterator(cartas, lista.iterator(), lista, valor, random2);
+                                if (lista.isEmpty()) {
+                                    iter.remove(); // Elimina la lista del mapa si está vacía
                                 }
-                            }   
-                            if(cartas.size()>random2) break;                   
-                        }
-                        for (List<Carta> lista : this.cartas.values()) {
-                            if(lista.size()==2 && lista.get(0).getValor()!=valor){
-                                for(Carta c: lista){
-                                    cartas.add(c);
-                                    removeCard(c);
-                                    if(cartas.size()>=random2) break;
+                                if (cartas.size() >= random2) break;
+                            }                          
+                        }                     
+                        for (Iterator<List<Carta>> iter = this.cartas.values().iterator(); iter.hasNext() && cartas.size() < random2;) {
+                            List<Carta> lista = iter.next();
+                            if(lista.size()==2){
+                                processListWithIterator(cartas, lista.iterator(), lista, valor, random2);
+                                if (lista.isEmpty()) {
+                                    iter.remove(); // Elimina la lista del mapa si está vacía
                                 }
-                            }   
-                            if(cartas.size()>random2) break;
+                                if (cartas.size() >= random2) break;
+                            }                          
                         }
-                        for (List<Carta> lista : this.cartas.values()) {
-                            if(lista.size()==3 && lista.get(0).getValor()!=valor){
-                                for(Carta c: lista){
-                                    cartas.add(c);
-                                    removeCard(c);
-                                    if(cartas.size()>=random2) break;
+                        for (Iterator<List<Carta>> iter = this.cartas.values().iterator(); iter.hasNext() && cartas.size() < random2;) {
+                            List<Carta> lista = iter.next();
+                            if(lista.size()==3){
+                                processListWithIterator(cartas, lista.iterator(), lista, valor, random2);
+                                if (lista.isEmpty()) {
+                                    iter.remove(); // Elimina la lista del mapa si está vacía
                                 }
-                            }
-                            if(cartas.size()>random2) break;
+                                if (cartas.size() >= random2) break;
+                            }                          
                         }
-                        for (List<Carta> lista : this.cartas.values()) {
-                             if(lista.size()==4 && lista.get(0).getValor()!=valor){
-                                for(Carta c: lista){
-                                    cartas.add(c);
-                                    removeCard(c);
-                                    if(cartas.size()>=random2) break;
+                        for (Iterator<List<Carta>> iter = this.cartas.values().iterator(); iter.hasNext() && cartas.size() < random2;) {
+                            List<Carta> lista = iter.next();
+                            if(lista.size()==4){
+                                processListWithIterator(cartas, lista.iterator(), lista, valor, random2);
+                                if (lista.isEmpty()) {
+                                    iter.remove(); // Elimina la lista del mapa si está vacía
                                 }
-                            }   
-                            if(cartas.size()>random2) break;                  
+                                if (cartas.size() >= random2) break;
+                            }                          
                         }
-                        System.out.println("Soy " + id + " y meto " + cartas);
-                        return cartas;
                     }
-                }else{
-                    int suma = stats.getLevantar()+ stats.getNoLevantar();
-                    int porcentajeLevantar = (stats.getLevantar()/suma)*100;
-                    int random = (int) (Math.floor(Math.random()*(0-100+1)+100));//numero del 0 al 100 ambos incluidos
-                    if(random >porcentajeLevantar || contador==0){
-                        //Mentir
-                        int random2 = (int) (Math.floor(Math.random()*(1-3+1)+3));
-                        if(porcentajeLevantar >40){
-                            random2 = (int) (Math.floor(Math.random()*(1-2+1)+2));
-                        }
-                        for (List<Carta> lista : this.cartas.values()) {
-                            if(lista.size()==1 && lista.get(0).getValor()!=valor){
-                                for(Carta c: lista){
-                                    cartas.add(c);
-                                    removeCard(c);
-                                    if(cartas.size()>=random2) break;
+                } else {
+                    int suma = stats.getLevantar() + stats.getNoLevantar();
+                    int porcentajeLevantar = (suma > 0) ? (stats.getLevantar() * 100) / suma : 0;
+                    int random = (int) (Math.floor(Math.random() * (0 - 100 + 1) + 100));
+
+                    if (random > porcentajeLevantar || contador == 0) {
+                        // Caso: Mienta
+                        random2 = (porcentajeLevantar > 40) ? (int) (Math.floor(Math.random() * (1 - 2 + 1) + 2))
+                                                            : (int) (Math.floor(Math.random() * (1 - 3 + 1) + 3));
+
+                        for (Iterator<List<Carta>> iter = this.cartas.values().iterator(); iter.hasNext();) {
+                            List<Carta> lista = iter.next();
+                            if(lista.size()==1){
+                                processListWithIterator(cartas, lista.iterator(), lista, valor, random2);
+                                if (lista.isEmpty()) {
+                                    iter.remove(); // Elimina la lista del mapa si está vacía
                                 }
-                            }   
-                            if(cartas.size()>random2) break;                   
-                        }
-                        for (List<Carta> lista : this.cartas.values()) {
-                            if(lista.size()==2 && lista.get(0).getValor()!=valor){
-                                for(Carta c: lista){
-                                    cartas.add(c);
-                                    removeCard(c);
-                                    if(cartas.size()>=random2) break;
+                                if (cartas.size() >= random2) break;
+                            }                          
+                        }                     
+                        for (Iterator<List<Carta>> iter = this.cartas.values().iterator(); iter.hasNext() && cartas.size() >= random2;) {
+                            List<Carta> lista = iter.next();
+                            if(lista.size()==2){
+                                processListWithIterator(cartas, lista.iterator(), lista, valor, random2);
+                                if (lista.isEmpty()) {
+                                    iter.remove(); // Elimina la lista del mapa si está vacía
                                 }
-                            }   
-                            if(cartas.size()>random2) break;
+                                if (cartas.size() >= random2) break;
+                            }                          
                         }
-                        for (List<Carta> lista : this.cartas.values()) {
-                            if(lista.size()==3 && lista.get(0).getValor()!=valor){
-                                for(Carta c: lista){
-                                    cartas.add(c);
-                                    removeCard(c);
-                                    if(cartas.size()>=random2) break;
+                        for (Iterator<List<Carta>> iter = this.cartas.values().iterator(); iter.hasNext() && cartas.size() >= random2;) {
+                            List<Carta> lista = iter.next();
+                            if(lista.size()==3){
+                                processListWithIterator(cartas, lista.iterator(), lista, valor, random2);
+                                if (lista.isEmpty()) {
+                                    iter.remove(); // Elimina la lista del mapa si está vacía
                                 }
+                                if (cartas.size() >= random2) break;
+                            }                          
+                        }
+                        for (Iterator<List<Carta>> iter = this.cartas.values().iterator(); iter.hasNext() && cartas.size() >= random2;) {
+                            List<Carta> lista = iter.next();
+                            if(lista.size()==4){
+                                processListWithIterator(cartas, lista.iterator(), lista, valor, random2);
+                                if (lista.isEmpty()) {
+                                    iter.remove(); // Elimina la lista del mapa si está vacía
+                                }
+                                if (cartas.size() >= random2) break;
+                            }                          
+                        }
+                    } else {
+                        // Caso: Diga la verdad
+                        random2 = (int) (Math.floor(Math.random() * (1 - 3 + 1) + 3));
+                        if (porcentajeLevantar > 40) {
+                            Carta carta = this.cartas.get(valor).get(0);
+                            cartas.add(carta);
+                            removeCard(carta);
+                        } else {
+                            List<Carta> lista = this.cartas.get(valor);
+                            processListWithIterator(cartas, lista.iterator(), lista, valor, random2);
+                            if (lista.isEmpty()) {
+                                this.cartas.remove(valor); // Elimina la lista del mapa si está vacía
                             }
-                            if(cartas.size()>random2) break;
                         }
-                        for (List<Carta> lista : this.cartas.values()) {
-                             if(lista.size()==4 && lista.get(0).getValor()!=valor){
-                                for(Carta c: lista){
-                                    cartas.add(c);
-                                    removeCard(c);
-                                    if(cartas.size()>=random2) break;
-                                }
-                            }   
-                            if(cartas.size()>random2) break;                  
-                        }
-                    }else{
-                        //Decir la verdad
-                        int random2 = (int) (Math.floor(Math.random()*(1-3+1)+3));
-                        if(porcentajeLevantar >40){
-                            cartas.add(this.cartas.get(valor).get(0));
-                            removeCard(this.cartas.get(valor).get(0));
-                        }else{
-                            Iterator<Carta> iterator = this.cartas.get(valor).iterator();
-                            while (iterator.hasNext()) {
-                                Carta carta = iterator.next();
-                                cartas.add(carta);
-                                iterator.remove();
-                            }
-                            // Elimina la entrada del mapa
-                            this.cartas.remove(valor);
-                        }
-                        System.out.println("Soy " + id + " y meto " + cartas);
-                        return cartas;
                     }
                 }
-              
+
+                System.out.println("Soy " + id + " y meto " + cartas);
+                return cartas;   
         }
         System.out.println("Soy " + id + " y meto " + cartas);
         return null;
+    }
+    private void processListWithIterator(List<Carta> cartas, Iterator<Carta> iterator, List<Carta> lista, String valor, int random2) {
+        while (iterator.hasNext()) {
+            Carta carta = iterator.next();
+            cartas.add(carta);
+            iterator.remove();
+            if (cartas.size() >= random2 || lista.isEmpty()) {
+                break;
+            }
+        }
     }
     @Override
     public String declarar(){
