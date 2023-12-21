@@ -9,17 +9,17 @@ public class Estadisticas  {
     private int verdades;
     private int levantar;
     private int noLevantar;
-    private int nPartidas;
+    private int nRondas;
 
     public Estadisticas() {
-        this.nPartidas = 0;
+        this.nRondas = 0;
         this.mentiras = 0;
         this.verdades = 0;
         this.levantar = 0;
         this.noLevantar = 0;
     }
-    public int getNPartidas(){
-        return nPartidas;
+    public int getNRondas(){
+        return nRondas;
     }
     public int getMentiras() {
         return mentiras;
@@ -56,8 +56,8 @@ public class Estadisticas  {
     void setMentiras(int aInt) {
         mentiras = aInt;
     }
-    void setNPartidas(int aInt){
-        nPartidas = aInt;
+    void setNRondas(int aInt){
+        nRondas = aInt;
     }
     void setVerdades(int aInt) {
         verdades = aInt;
@@ -69,5 +69,9 @@ public class Estadisticas  {
 
     void setNoLevantar(int aInt) {
         noLevantar = aInt;
+    }
+
+    void incrementarRondas() {
+        this.nRondas++;
     }
 }

@@ -23,12 +23,13 @@ public class JuegoMentiroso {
         this.baraja = crearBaraja();
         this.mesa = new ArrayList<>();
         this.players = new ArrayList<>();
-        for(int i=0; i<N_JUGADORES -1; i++){
+        for(int i=0; i<N_JUGADORES -2; i++){
             this.players.add(new Player("J"+i));
         }
-        Bot bot = new Bot("B1","mono");
-        bot.setIndexLeftPlayer(players.size()-1);
-        bot.setIndexRightPlayer(0);
+        this.players.add(new Bot("B0","mono"));
+        Bot bot = new Bot("B1","inteligente");
+        bot.setIndexLeftPlayer(players.get(players.size()-1).getId());
+        bot.setIndexRightPlayer(players.get(0).getId());
         this.players.add(bot);
         
         cargarEstadisticasDesdeArchivo();
@@ -38,7 +39,7 @@ public class JuegoMentiroso {
                 Estadisticas stats = new Estadisticas();
                 estadisticasMap.put(playerId, stats);
             }
-    }
+        }
         
     }
 
@@ -59,6 +60,7 @@ public class JuegoMentiroso {
                 }else{
                     System.out.println("---TURNO "+players.get(i).getId()+"---");
                 }
+                estadisticasMap.get(players.get(i).getId()).incrementarRondas();     
                 List<Carta> cartas= players.get(i).jugar(declarado);
                 System.out.println("---Voy con "+cartas.size()+" "+declarado);
                 mesa.addAll(cartas);   
@@ -144,7 +146,7 @@ public class JuegoMentiroso {
                     JSONObject jsonData = jsonArray.getJSONObject(i);
                     String playerId = jsonData.getString("id");
                     Estadisticas stats = new Estadisticas();
-                    stats.setNPartidas(jsonData.getInt("nPartidas"));
+                    stats.setNRondas(jsonData.getInt("nRondas"));
                     stats.setMentiras(jsonData.getInt("mentiras"));
                     stats.setVerdades(jsonData.getInt("verdades"));
                     stats.setLevantar(jsonData.getInt("levantar"));
@@ -166,7 +168,7 @@ public class JuegoMentiroso {
                 Estadisticas stats = estadisticasMap.get(playerId);
                 JSONObject jsonData = new JSONObject();
                 jsonData.put("id", playerId);
-                jsonData.put("nPartidas", stats.getNPartidas());
+                jsonData.put("nRondas", stats.getNRondas());
                 jsonData.put("mentiras", stats.getMentiras());
                 jsonData.put("verdades", stats.getVerdades());
                 jsonData.put("levantar", stats.getLevantar());

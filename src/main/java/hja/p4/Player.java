@@ -6,7 +6,10 @@ package hja.p4;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -15,18 +18,23 @@ import java.util.Scanner;
  */
 public class Player {
     
-    protected List<Carta> cartas;
     private Scanner scanner;
     protected String id;
     protected static List<String> cardValues = new ArrayList<>();
+    protected Map<String, List<Carta>> cartas = new HashMap<>();
     public Player(String id){
         this.id = id;
-        this.cartas = new ArrayList<>();
         this.scanner = new Scanner(System.in);
         Collections.addAll(cardValues, "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A");
     }
     public void addCard(Carta c){
-        this.cartas.add(c);
+        if(cartas.containsKey(c.getValor())){
+            cartas.get(c.getValor()).add(c);
+        }else{
+            List<Carta> cartasList = new ArrayList<>();
+            cartasList.add(c);
+            cartas.put(c.getValor(),  cartasList);
+        }
     }
     public String declarar(){
         System.out.println("Mano actual del jugador: " + cartas);
@@ -56,11 +64,27 @@ public class Player {
         }  
         return listCartas;   
     }
-    public void removeCard(Carta c){
-        for(int i=0; i<cartas.size();i++){
-            if(cartas.get(i).isEqual(c)) {cartas.remove(i); break;};
+    public void removeCard(Carta c) {
+        Iterator<Map.Entry<String, List<Carta>>> iterator = cartas.entrySet().iterator();
+
+        while (iterator.hasNext()) {
+            Map.Entry<String, List<Carta>> entry = iterator.next();
+            List<Carta> lista = entry.getValue();
+
+            int i = 0;
+            while (i < lista.size()) {
+                if (lista.get(i).isEqual(c)) {
+                    lista.remove(i);
+                    if (lista.isEmpty()) {
+                        iterator.remove();  // Eliminar la entrada del mapa si la lista está vacía
+                    }
+                    break;  // Salir del bucle interno si la carta es encontrada y eliminada
+                }
+                i++;
+            }
         }
     }
+
     private boolean procesarJugada(String[] arrayCartas) {
         for (String arrayCarta : arrayCartas) {
             if (arrayCarta.length() != 2) {
@@ -69,10 +93,15 @@ public class Player {
             }
             Carta c = new Carta(arrayCarta.charAt(0) + "", arrayCarta.charAt(1) + "");
             boolean encontrado = false;
-            for(Carta aux: this.cartas){
-                if(aux.isEqual(c)){
-                    encontrado = true;
-                    break;
+            for (List<Carta> lista : cartas.values()) {
+                for (int i = 0; i < lista.size(); i++) {
+                    if (lista.get(i).isEqual(c)) {
+                        encontrado = true;
+                        break; 
+                    }
+                }
+                if (encontrado) {
+                    break; 
                 }
             }
             if(!encontrado){
@@ -100,6 +129,8 @@ public class Player {
     }
 
     void addCards(List<Carta> mesa) {
-        cartas.addAll(mesa);
+        for(Carta c: mesa){
+            addCard(c);
+        }
     }
 }

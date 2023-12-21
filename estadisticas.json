@@ -2,7 +2,7 @@
 [
     {
       "id": "J0",
-      "nPartidas": 0,
+      "nRondas": 0,
       "mentiras": 0,
       "verdades": 0,
       "levantar": 0,
@@ -10,7 +10,7 @@
     },
     {
       "id": "J1",
-      "nPartidas": 0,
+      "nRondas": 0,
       "mentiras": 0,
       "verdades": 0,
       "levantar": 0,
