@@ -363,7 +363,7 @@ public class Bot extends Player{
                         int suma = stats.getMentiras()+ stats.getVerdades();
                         int porcentajeMentiras = (stats.getMentiras()/suma)*100;
                         int random = (int) N + (int) (Math.random() * ((100 - 0) + 1));
-                        if(random <porcentajeMentiras){
+                        if(random > porcentajeMentiras){
                             //No levanto
                             return false;
                         }else{

@@ -17,7 +17,7 @@ public class Main {
         
         Player p;
         Map<String, Integer> victorias = new HashMap<>();
-        for(int i = 0; i < 10; i++){
+        for(int i = 0; i < 100; i++){
             JuegoMentiroso juego = new JuegoMentiroso();
             System.out.println("##########################JUEGO Numero: " + i);
             p = juego.jugar();
