@@ -23,16 +23,22 @@ public class JuegoMentiroso {
         this.baraja = crearBaraja();
         this.mesa = new ArrayList<>();
         this.players = new ArrayList<>();
-        for(int i=0; i<N_JUGADORES -2; i++){
+        for(int i=0; i<N_JUGADORES -3; i++){
             this.players.add(new Player("J"+i));
         }
-        this.players.add(new Bot("B0","mono"));
-        Bot bot = new Bot("B1","inteligente");
-        bot.setIndexLeftPlayer(players.get(players.size()-1).getId());
-        bot.setIndexRightPlayer(players.get(0).getId());
-        this.players.add(bot);
+        this.players.add(new Bot("M0","mono"));
         
-        cargarEstadisticasDesdeArchivo();
+        Bot bot = new Bot("I1","inteligente");
+        bot.setIndexLeftPlayer(players.get(0).getId());
+        bot.setIndexRightPlayer("I2");
+        
+        
+        Bot bot2 = new Bot("I2","inteligente");
+        bot2.setIndexLeftPlayer("I1");
+        bot2.setIndexRightPlayer(players.get(0).getId());
+        this.players.add(bot);
+        this.players.add(bot2);
+        cargarEstadisticasDesdeArchivo(); 
         for (Player player : players) {
             String playerId = player.getId();
             if (!estadisticasMap.containsKey(playerId)) {
@@ -65,7 +71,9 @@ public class JuegoMentiroso {
                 System.out.println("---Voy con "+cartas.size()+" "+declarado);
                 mesa.addAll(cartas);   
                 int next = (i+1)%N_JUGADORES;
-                levantar = players.get(next).contestar(declarado,cartas.size());
+                boolean ultimas = false;
+                if(players.get(i).contarCartasEnMapa() == 0) ultimas = true;
+                levantar = players.get(next).contestar(declarado,cartas.size(),ultimas);
                 if(levantar){
                     mentira = false;
                     estadisticasMap.get(players.get(next).getId()).incrementarLevantar();
@@ -104,6 +112,9 @@ public class JuegoMentiroso {
                 }
                 
             }
+        }
+        for(Player p: players){
+            System.out.println("Cartas "+p.getId()+p.getCards());
         }
         return players.get(ganador);
     }

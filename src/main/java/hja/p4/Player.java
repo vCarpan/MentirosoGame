@@ -121,8 +121,16 @@ public class Player {
     public boolean isWin(){
         return cartas.isEmpty();
     }
+    public int contarCartasEnMapa() {
+        int totalCartas = 0;
 
-    boolean contestar(String valor,int nCartas) {
+        for (List<Carta> lista : this.cartas.values()) {
+            totalCartas += lista.size();
+        }
+
+        return totalCartas;
+    }
+    boolean contestar(String valor,int nCartas, boolean ultimasCartas) {
         System.out.println("Quiere destapar la verdad? (responda con 0 -> No o 1-> Si)");
         String decision = scanner.nextLine();
         return decision.equals("1");
@@ -132,5 +140,8 @@ public class Player {
         for(Carta c: mesa){
             addCard(c);
         }
+    }
+    public Map<String, List<Carta>> getCards(){
+        return this.cartas;
     }
 }
