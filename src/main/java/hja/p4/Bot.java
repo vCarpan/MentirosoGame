@@ -28,6 +28,7 @@ public class Bot extends Player{
     
     @Override
     public List<Carta> jugar(String valor){
+        System.out.println("Soy " + id + " y tengo estas " + this.cartas);
         List<Carta> cartas = new ArrayList();
         int valorEntero = (int) (Math.floor(Math.random()*(N-M+1)+M));
         while(valorEntero > this.cartas.size()){
