@@ -130,7 +130,7 @@ public class Player {
 
         return totalCartas;
     }
-    boolean contestar(String valor,int nCartas, boolean ultimasCartas) {
+    boolean contestar(String valor,int nCartas, int nCartasJugador, String turno) {
         System.out.println("Quiere destapar la verdad? (responda con 0 -> No o 1-> Si)");
         String decision = scanner.nextLine();
         return decision.equals("1");

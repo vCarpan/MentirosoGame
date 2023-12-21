@@ -55,6 +55,7 @@ public class JuegoMentiroso {
         boolean levantar;
         boolean mentira;
         String declarado = "";
+        String turnoDe ="";
         boolean finTurno = true;
         int ganador = 0;
         while(!fin){
@@ -62,6 +63,7 @@ public class JuegoMentiroso {
                 if(finTurno){
                     finTurno = false;
                     System.out.println("---DECLARACION "+players.get(i).getId()+"---");
+                    turnoDe="";
                     declarado = players.get(i).declarar();
                 }else{
                     System.out.println("---TURNO "+players.get(i).getId()+"---");
@@ -71,9 +73,7 @@ public class JuegoMentiroso {
                 System.out.println("---Voy con "+cartas.size()+" "+declarado);
                 mesa.addAll(cartas);   
                 int next = (i+1)%N_JUGADORES;
-                boolean ultimas = false;
-                if(players.get(i).contarCartasEnMapa() == 0) ultimas = true;
-                levantar = players.get(next).contestar(declarado,cartas.size(),ultimas);
+                levantar = players.get(next).contestar(declarado,cartas.size(),players.get(i).contarCartasEnMapa(),turnoDe="");
                 if(levantar){
                     mentira = false;
                     estadisticasMap.get(players.get(next).getId()).incrementarLevantar();

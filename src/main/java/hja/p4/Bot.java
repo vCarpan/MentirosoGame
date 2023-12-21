@@ -296,38 +296,46 @@ public class Bot extends Player{
     }
     
     @Override
-    boolean contestar(String valor,int nCartas, boolean ultimasCartas) {
+    boolean contestar(String valor,int nCartas, int nCartasJugador,String turno) {
         int sum =0;
-        if(ultimasCartas) return true;
+        if(nCartasJugador ==0) return true;
         if(this.cartas.containsKey(valor)){
             sum = this.cartas.get(valor).size();
         }
         if(nCartas > (4 - sum)) return true;
         switch(this.tipo){
             case "inteligente":
-                Estadisticas stats = JuegoMentiroso.estadisticasMap.get(indexLeftPlayer);
-                if(stats.getNRondas()<30){
-                    if(nCartas >= 2 && sum==2){
-                        return true; //levanta
-                    }else if(sum>0){
+                if(nCartasJugador <5 && turno!=indexLeftPlayer){
+                    int random = (int) N + (int) (Math.random() * ((0 - 100) + 1));
+                    if(random > 80){
                         return false;
-                    }else{
-                        int random = (int) N + (int) (Math.random() * ((0 - 100) + 1));
-                        if(random > 80){
-                            return false;
-                        }
-                        return true;
                     }
+                    return true;
                 }else{
-                    int suma = stats.getMentiras()+ stats.getVerdades();
-                    int porcentajeMentiras = (stats.getMentiras()/suma)*100;
-                    int random = (int) N + (int) (Math.random() * ((0 - 100) + 1));//numero del 0 al 100 ambos incluidos
-                    if(random >porcentajeMentiras){
-                        //No levanto
-                        return false;
+                    Estadisticas stats = JuegoMentiroso.estadisticasMap.get(indexLeftPlayer);
+                    if(stats.getNRondas()<30){
+                        if(nCartas >= 2 && sum==2){
+                            return true; //levanta
+                        }else if(sum>0){
+                            return false;
+                        }else{
+                            int random = (int) N + (int) (Math.random() * ((0 - 100) + 1));
+                            if(random > 80){
+                                return false;
+                            }
+                            return true;
+                        }
                     }else{
-                        //levanto
-                        return true;
+                        int suma = stats.getMentiras()+ stats.getVerdades();
+                        int porcentajeMentiras = (stats.getMentiras()/suma)*100;
+                        int random = (int) N + (int) (Math.random() * ((0 - 100) + 1));//numero del 0 al 100 ambos incluidos
+                        if(random >porcentajeMentiras){
+                            //No levanto
+                            return false;
+                        }else{
+                            //levanto
+                            return true;
+                        }
                     }
                 }
             case "mono":
